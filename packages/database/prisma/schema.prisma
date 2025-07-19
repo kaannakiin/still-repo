@@ -8,24 +8,93 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Locale {
+  TR
+  EN
+  DE
+  FR
+}
+
+enum Currency {
+  TRY
+  USD
+  EUR
+}
+
 enum Role {
   OWNER
   ADMIN
   USER
 }
 
+enum MemberShipTier {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum Status {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
 model User {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String
   surname       String
   password      String?
-  phone         String?   @unique
-  email         String?   @unique
+  phone         String?        @unique
+  email         String?        @unique
   verified      DateTime?
   image         String?
-  role          Role      @default(USER)
+  role          Role           @default(USER)
   refreshTokens String?
+  tier          MemberShipTier @default(FREE)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  subs      Subscription[]
+}
+
+model MembershipPlanPrices {
+  id       String   @id @default(cuid())
+  currency Currency
+  locale   Locale
+
+  price           Float
+  discountedPrice Float?
+
+  membership   MembershipPlan @relation(fields: [membershipId], references: [id])
+  membershipId String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([currency, locale, membershipId])
+}
+
+model MembershipPlan {
+  id       String                 @id @default(cuid())
+  name     String
+  tier     MemberShipTier         @unique
+  features Json?
+  prices   MembershipPlanPrices[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Subscription Subscription[]
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  status Status @default(ACTIVE)
+
+  planId    String
+  plan      MembershipPlan @relation(fields: [planId], references: [id])
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  createdAt DateTime       @default(now())
+  endedAt   DateTime?
+  updatedAt DateTime       @updatedAt
 }

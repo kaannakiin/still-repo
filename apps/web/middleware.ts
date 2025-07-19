@@ -69,14 +69,11 @@ export async function middleware(req: NextRequest) {
 
         if (newAuthRes.ok) {
           auth = (await newAuthRes.json()) as TokenPayload;
-          console.log("New auth fetched:", auth);
         } else {
-          console.error("Failed to fetch new auth after refresh");
           auth = null;
         }
       }
 
-      // Route kontrolü için auth durumunu kontrol et
       const pathname = req.nextUrl.pathname;
       const routeCheckResult = checkRouteAccess(pathname, auth);
 

@@ -12,10 +12,10 @@ import { RegisterSchema, RegisterSchemaType, TokenPayload } from '@repo/types';
 import { type Response } from 'express';
 import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './current-user.decorator';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
